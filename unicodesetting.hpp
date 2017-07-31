@@ -1,4 +1,6 @@
-﻿#ifndef UNICODESETTING_HPP
+﻿// UTF-8 with BOM
+
+#ifndef UNICODESETTING_HPP
 #define UNICODESETTING_HPP
 
 #ifdef WIN32
@@ -10,35 +12,15 @@
 #include <codecvt>
 #include <memory>
 
-template <typename CHAR_T = wchar_t>
-std::locale configureLocale_Unicode(std::locale base = std::locale::classic(),
-                            std::initializer_list<std::locale::category> category_copy = {std::locale::ctype}){
+#include "ctype/ctype_unicode.hpp"
 
-    if(category_copy.size() > 0) {
+std::locale configureLocale_Unicode(std::locale base = {})
+{
+    // TODO: to add other languages
 
-        constexpr const char* names_locs[] = {
-            // POSIX OS
-            "ru_RU.UTF-8",
-            "en_US.UTF-8",
-            // windows
-            "Russia_Russia"
-        };
+    base = std::locale(base, new ctype_unicode);
 
-        std::locale loc_new; // one of the 'names_locs' or the global
-
-        for(size_t i = 0; i < sizeof(names_locs)/sizeof(const char*); ++i){
-            try {
-                loc_new = std::locale( names_locs[i] );
-                break;
-            } catch (...) {}
-        }
-
-        for(auto category : category_copy){
-            base = std::locale(base, loc_new, category);
-        }
-    }
-
-    return { base, new std::codecvt_utf8<CHAR_T> };
+    return { std::move(base), new std::codecvt_utf8<wchar_t> };
 }
 
 
@@ -53,7 +35,9 @@ std::locale InitUnicodeStreams(std::locale base = {}){
 	}
 #endif
 
-    auto locUnicode = configureLocale_Unicode(base, {});
+    std::ios::sync_with_stdio(false);
+
+    auto locUnicode = configureLocale_Unicode(base);
 
     std::wcin.imbue(locUnicode);
     std::wcout.imbue(locUnicode);

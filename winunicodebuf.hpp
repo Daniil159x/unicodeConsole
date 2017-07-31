@@ -1,4 +1,10 @@
-﻿#ifndef WINUNICODEBUF_HPP
+﻿// UTF-8 with BOM
+
+/*
+    https://alfps.wordpress.com/2011/12/08/unicode-part-2-utf-8-stream-mode/
+*/
+
+#ifndef WINUNICODEBUF_HPP
 #define WINUNICODEBUF_HPP
 #ifdef WIN32
 
